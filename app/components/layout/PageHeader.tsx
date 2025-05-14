@@ -51,9 +51,12 @@ export default function PageHeader({
                 <Typography key={item.href} color="text.primary">
                   {item.label}
                 </Typography>
-              ) : (
-                <Link key={item.href} href={item.href} passHref legacyBehavior>
-                  <MuiLink underline="hover" color="inherit">
+              ) : (                <Link 
+                  key={item.href} 
+                  href={item.href} 
+                  style={{ textDecoration: 'none' }}
+                >
+                  <MuiLink underline="hover" color="inherit" component="span">
                     {item.label}
                   </MuiLink>
                 </Link>

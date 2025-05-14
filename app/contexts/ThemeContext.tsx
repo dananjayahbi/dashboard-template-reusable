@@ -45,7 +45,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>('system');
   const [primaryColor, setPrimaryColor] = useState<ThemeColor>('blue');
   const [actualMode, setActualMode] = useState<PaletteMode>('light');
-
   // Effect to load theme preferences from localStorage (client-side only)
   useEffect(() => {
     const storedMode = localStorage.getItem('themeMode') as ThemeMode;
@@ -58,7 +57,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (storedColor && themeColors[storedColor]) {
       setPrimaryColor(storedColor);
     }
-    
+  }, []); // Only run once on component mount
+  
+  // Separate effect to handle mode changes and system preferences
+  useEffect(() => {
     // Initialize system preference detection
     if (mode === 'system') {
       const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;

@@ -91,9 +91,11 @@ export default function ForgotPassword() {
               <Typography variant="body1" paragraph>
                 Please check your email inbox for instructions on how to reset your password. 
                 The link will expire after 24 hours.
-              </Typography>
-              <Link href="/auth/signin" passHref legacyBehavior>
-                <MuiLink>
+              </Typography>              <Link 
+                href="/auth/signin"
+                style={{ textDecoration: 'none' }}
+              >
+                <MuiLink component="span">
                   Return to sign in
                 </MuiLink>
               </Link>
@@ -135,9 +137,11 @@ export default function ForgotPassword() {
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </Button>
               
-              <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Link href="/auth/signin" passHref legacyBehavior>
-                  <MuiLink variant="body2">
+              <Box sx={{ mt: 2, textAlign: 'center' }}>                <Link 
+                  href="/auth/signin"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <MuiLink variant="body2" component="span">
                     Back to Sign In
                   </MuiLink>
                 </Link>

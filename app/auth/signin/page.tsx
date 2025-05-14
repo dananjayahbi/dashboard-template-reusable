@@ -152,9 +152,11 @@ export default function SignIn() {
                 display: 'flex', 
                 justifyContent: 'flex-end' 
               }}
-            >
-              <Link href="/auth/forgot-password" passHref legacyBehavior>
-                <MuiLink variant="body2">
+            >              <Link 
+                href="/auth/forgot-password" 
+                style={{ textDecoration: 'none' }}
+              >
+                <MuiLink variant="body2" component="span">
                   Forgot password?
                 </MuiLink>
               </Link>
@@ -172,9 +174,11 @@ export default function SignIn() {
             
             <Box sx={{ mt: 2, textAlign: 'center' }}>
               <Typography variant="body2">
-                Don't have an account?{' '}
-                <Link href="/auth/signup" passHref legacyBehavior>
-                  <MuiLink variant="body2">
+                Don't have an account?{' '}                <Link 
+                  href="/auth/signup"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <MuiLink variant="body2" component="span">
                     Sign Up
                   </MuiLink>
                 </Link>

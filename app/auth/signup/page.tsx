@@ -285,9 +285,11 @@ export default function SignUp() {
             
             <Box sx={{ mt: 2, textAlign: 'center' }}>
               <Typography variant="body2">
-                Already have an account?{' '}
-                <Link href="/auth/signin" passHref legacyBehavior>
-                  <MuiLink variant="body2">
+                Already have an account?{' '}                <Link 
+                  href="/auth/signin"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <MuiLink variant="body2" component="span">
                     Sign In
                   </MuiLink>
                 </Link>
