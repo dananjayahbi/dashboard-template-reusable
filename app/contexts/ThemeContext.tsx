@@ -15,6 +15,8 @@ interface ThemeContextType {
   primaryColor: ThemeColor;
   setPrimaryColor: (color: ThemeColor) => void;
   actualMode: PaletteMode; // The actual mode applied ('light' or 'dark')
+  denseMode: boolean;
+  setDenseMode: (isDense: boolean) => void;
 }
 
 // Define theme color tokens
@@ -34,6 +36,8 @@ const ThemeContext = createContext<ThemeContextType>({
   primaryColor: 'blue',
   setPrimaryColor: () => {},
   actualMode: 'light',
+  denseMode: false,
+  setDenseMode: () => {},
 });
 
 // Custom hook to use the theme context
@@ -45,10 +49,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>('system');
   const [primaryColor, setPrimaryColor] = useState<ThemeColor>('blue');
   const [actualMode, setActualMode] = useState<PaletteMode>('light');
-  // Effect to load theme preferences from localStorage (client-side only)
+  const [denseMode, setDenseMode] = useState<boolean>(false);  // Effect to load theme preferences from localStorage (client-side only)
   useEffect(() => {
     const storedMode = localStorage.getItem('themeMode') as ThemeMode;
     const storedColor = localStorage.getItem('themeColor') as ThemeColor;
+    const storedDenseMode = localStorage.getItem('denseMode');
     
     if (storedMode) {
       setMode(storedMode);
@@ -56,6 +61,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     
     if (storedColor && themeColors[storedColor]) {
       setPrimaryColor(storedColor);
+    }
+
+    if (storedDenseMode) {
+      setDenseMode(storedDenseMode === 'true');
     }
   }, []); // Only run once on component mount
   
@@ -78,12 +87,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setActualMode(mode === 'dark' ? 'dark' : 'light');
     }
   }, [mode]);
-
   // Effect to save theme preferences when they change
   useEffect(() => {
     localStorage.setItem('themeMode', mode);
     localStorage.setItem('themeColor', primaryColor);
   }, [mode, primaryColor]);
+
+  // Effect to save dense mode preference
+  useEffect(() => {
+    localStorage.setItem('denseMode', denseMode.toString());
+  }, [denseMode]);
 
   // Function to update the theme mode
   const handleSetMode = (newMode: ThemeMode) => {
@@ -92,7 +105,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setActualMode(newMode === 'dark' ? 'dark' : 'light');
     }
   };
-
   // Create the MUI theme based on current preferences
   const theme = createTheme({
     palette: {
@@ -117,16 +129,57 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           },
         },
       },
+      // Apply dense mode settings to components
+      ...(denseMode ? {
+        MuiButton: {
+          defaultProps: {
+            size: 'small',
+          },
+        },
+        MuiTextField: {
+          defaultProps: {
+            size: 'small',
+            margin: 'dense',
+          },
+        },
+        MuiFormControl: {
+          defaultProps: {
+            size: 'small',
+            margin: 'dense',
+          },
+        },
+        MuiInputBase: {
+          defaultProps: {
+            margin: 'dense',
+          },
+        },
+        MuiTable: {
+          defaultProps: {
+            size: 'small',
+          },
+        },
+        MuiSwitch: {
+          defaultProps: {
+            size: 'small',
+          },
+        },
+        MuiCheckbox: {
+          defaultProps: {
+            size: 'small',
+          },
+        },
+      } : {}),
     },
   });
-
   return (
     <ThemeContext.Provider value={{ 
       mode, 
       setMode: handleSetMode, 
       primaryColor,
       setPrimaryColor,
-      actualMode
+      actualMode,
+      denseMode,
+      setDenseMode
     }}>
       <MUIThemeProvider theme={theme}>
         <CssBaseline />

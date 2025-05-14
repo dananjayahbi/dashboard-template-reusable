@@ -14,7 +14,9 @@ import {
   Tab,
   IconButton,
   Alert,
+  Skeleton,
   CircularProgress,
+  Container,
   Card,
   CardContent,
   Stack,
@@ -151,7 +153,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <>
+    <Container maxWidth="lg" sx={{ pb: 5 }}>
       <PageHeader
         title="My Profile"
         subtitle="View and update your profile information"
@@ -170,11 +172,10 @@ export default function ProfilePage() {
           {message.text}
         </Alert>
       )}
-      
-      <Grid container spacing={4}>
+        <Grid container spacing={4}>
         {/* Profile Summary Card */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{ borderRadius: 2, boxShadow: 3, height: '100%', overflow: 'visible' }}>
+        <Grid item xs={12} md={4} lg={4}>
+          <Card sx={{ borderRadius: 2, boxShadow: 3, height: '100%', overflow: 'visible' }}
             <Box sx={{ position: 'relative' }}>
               {/* Cover Image */}
               <Box 
@@ -489,6 +490,6 @@ export default function ProfilePage() {
           </Card>
         </Grid>
       </Grid>
-    </>
+    </Container>
   );
 }

@@ -50,9 +50,12 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       [path]: !prev[path],
     }));
   };
-
   // Check if a navigation item is currently active
   const isActive = (path: string) => {
+    // Special case for dashboard to avoid highlighting it for all dashboard sub-routes
+    if (path === '/dashboard') {
+      return pathname === '/dashboard';
+    }
     return pathname === path || pathname.startsWith(`${path}/`);
   };
 

@@ -141,20 +141,11 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           />
         </Box>
         
-        <Box sx={{ flexGrow: 1 }} />
-        
-        {/* Theme mode toggle */}
-        <Box sx={{ display: 'flex' }}>
-          <IconButton color="inherit" onClick={toggleThemeMode}>
-            {actualMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-          </IconButton>
-          
-          {/* Notifications */}
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+        <Box sx={{ flexGrow: 1 }} />          {/* Theme mode toggle */}
+          <Box sx={{ display: 'flex' }}>
+            <IconButton color="inherit" onClick={toggleThemeMode}>
+              {actualMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
           
           {/* User menu */}
           <Box sx={{ ml: 2 }}>
