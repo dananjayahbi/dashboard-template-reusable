@@ -1,0 +1,378 @@
+'use client';
+
+import { 
+  Grid, 
+  Paper, 
+  Box, 
+  Typography, 
+  Card, 
+  CardContent,
+  CardHeader,
+  Avatar,
+  IconButton,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Divider,
+  Button,
+  Container
+} from '@mui/material';
+import {
+  TrendingUp as TrendingUpIcon,
+  People as PeopleIcon,
+  ShoppingCart as ShoppingCartIcon,
+  MonetizationOn as RevenueIcon,
+  MoreVert as MoreVertIcon,
+  ArrowUpward as ArrowUpIcon,
+  ArrowDownward as ArrowDownIcon,
+  Add as AddIcon
+} from '@mui/icons-material';
+import PageHeader from '../components/layout/PageHeader';
+import TimeSeriesChart from '../components/charts/TimeSeriesChart';
+import DonutChart from '../components/charts/DonutChart';
+
+// Stat card component
+const StatCard = ({ 
+  title, 
+  value, 
+  icon, 
+  change, 
+  color
+}: { 
+  title: string; 
+  value: string; 
+  icon: React.ReactNode;
+  change: { value: number; positive: boolean };
+  color?: string;
+}) => {
+  return (
+    <Card sx={{ height: '100%', boxShadow: 2, borderRadius: 2 }}>
+      <CardContent>
+        <Grid container alignItems="center" spacing={2}>
+          <Grid item xs={8}>
+            <Typography variant="subtitle1" color="text.secondary">
+              {title}
+            </Typography>
+            <Typography variant="h4" sx={{ mt: 1, fontWeight: 500 }}>
+              {value}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              {change.positive ? 
+                <ArrowUpIcon fontSize="small" color="success" /> : 
+                <ArrowDownIcon fontSize="small" color="error" />
+              }
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  ml: 0.5, 
+                  color: change.positive ? 'success.main' : 'error.main',
+                  fontWeight: 500
+                }}
+              >
+                {`${change.value}%`}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                vs last month
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={4} sx={{ textAlign: 'right' }}>
+            <Avatar
+              sx={{
+                bgcolor: color || 'primary.main',
+                width: 56,
+                height: 56,
+                ml: 'auto',
+                boxShadow: '0 4px 14px 0 rgba(0,0,0,0.12)'
+              }}
+            >
+              {icon}
+            </Avatar>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Activity item component
+const ActivityItem = ({ 
+  primary, 
+  secondary, 
+  avatar,
+  date
+}: { 
+  primary: string;
+  secondary: string;
+  avatar: React.ReactNode;
+  date: string;
+}) => {
+  return (
+    <>
+      <ListItem alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar sx={{ bgcolor: 'primary.light' }}>{avatar}</Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary={primary}
+          secondary={
+            <>
+              <Typography
+                component="span"
+                variant="body2"
+                color="text.primary"
+              >
+                {secondary}
+              </Typography>
+              <Typography
+                component="span"
+                variant="body2"
+                color="text.secondary"
+                sx={{ display: 'block', mt: 0.5 }}
+              >
+                {date}
+              </Typography>
+            </>
+          }
+        />
+      </ListItem>
+      <Divider variant="inset" component="li" />
+    </>
+  );
+};
+
+// Project progress component
+const ProjectProgress = ({
+  title,
+  progress,
+  color
+}: {
+  title: string;
+  progress: number;
+  color?: string;
+}) => {
+  return (
+    <Box sx={{ mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+        <Typography variant="body2">{title}</Typography>
+        <Typography variant="body2" color="text.secondary">{`${progress}%`}</Typography>
+      </Box>
+      <LinearProgress 
+        variant="determinate" 
+        value={progress} 
+        color={
+          color as 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' | undefined
+        }
+        sx={{ height: 6, borderRadius: 3 }}
+      />
+    </Box>
+  );
+};
+
+export default function DashboardHome() {
+  // Sample data for the dashboard
+  const timeSeriesData = {
+    xAxisData: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    series: [
+      {
+        name: 'This Year',
+        data: [18, 25, 30, 35, 40, 60, 70],
+        color: '#4CAF50',
+      },
+      {
+        name: 'Last Year',
+        data: [15, 20, 25, 30, 35, 40, 45],
+        color: '#90CAF9',
+      },
+    ],
+  };
+
+  // Sample data for DonutChart
+  const donutData = [
+    { id: 0, value: 40, label: 'Desktop', color: '#2196F3' },
+    { id: 1, value: 35, label: 'Mobile', color: '#4CAF50' },
+    { id: 2, value: 25, label: 'Tablet', color: '#FFC107' },
+  ];
+
+  return (
+    <>
+      <PageHeader
+        title="Dashboard"
+        subtitle="Welcome to your dashboard"
+        action={
+          <Button 
+            variant="contained" 
+            startIcon={<AddIcon />}
+          >
+            Add Widget
+          </Button>
+        }
+      />
+
+      <Grid container spacing={3}>
+        {/* Stat Cards */}
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Total Revenue"
+            value="$24,500"
+            icon={<RevenueIcon />}
+            change={{ value: 12, positive: true }}
+            color="#4CAF50"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Total Users"
+            value="1,250"
+            icon={<PeopleIcon />}
+            change={{ value: 8, positive: true }}
+            color="#2196F3"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Total Orders"
+            value="456"
+            icon={<ShoppingCartIcon />}
+            change={{ value: 5, positive: true }}
+            color="#FF9800"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Growth Rate"
+            value="18%"
+            icon={<TrendingUpIcon />}
+            change={{ value: 3, positive: false }}
+            color="#F44336"
+          />
+        </Grid>
+
+        {/* Charts - First Row */}
+        <Grid item xs={12} md={8}>
+          <Card sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <CardHeader 
+              title="Revenue Overview" 
+              action={
+                <IconButton aria-label="settings">
+                  <MoreVertIcon />
+                </IconButton>
+              }
+            />
+            <CardContent sx={{ height: '300px' }}>
+              <TimeSeriesChart 
+                title="" 
+                xAxisData={timeSeriesData.xAxisData}
+                series={timeSeriesData.series}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <CardHeader 
+              title="Device Distribution" 
+              action={
+                <IconButton aria-label="settings">
+                  <MoreVertIcon />
+                </IconButton>
+              }
+            />
+            <CardContent sx={{ height: '300px' }}>
+              <DonutChart 
+                title="" 
+                data={donutData}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Second Row */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <CardHeader 
+              title="Projects Status" 
+              action={
+                <IconButton aria-label="settings">
+                  <MoreVertIcon />
+                </IconButton>
+              }
+            />
+            <CardContent sx={{ maxHeight: '350px', overflow: 'auto' }}>
+              <ProjectProgress
+                title="Website Redesign"
+                progress={85}
+                color="primary"
+              />
+              <ProjectProgress
+                title="Mobile App Development"
+                progress={65}
+                color="secondary"
+              />
+              <ProjectProgress
+                title="API Integration"
+                progress={45}
+                color="warning"
+              />
+              <ProjectProgress
+                title="Database Migration"
+                progress={35}
+                color="error"
+              />
+              <ProjectProgress
+                title="Documentation"
+                progress={90}
+                color="success"
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Recent Activities */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ boxShadow: 2, borderRadius: 2 }}
+            <CardHeader 
+              title="Recent Activities" 
+              action={
+                <IconButton aria-label="settings">
+                  <MoreVertIcon />
+                </IconButton>
+              }
+            />
+            <CardContent sx={{ p: 0 }}>
+              <List sx={{ width: '100%' }}>
+                <ActivityItem
+                  primary="John Doe"
+                  secondary="Added a new project"
+                  avatar={<PeopleIcon />}
+                  date="Today at 11:30 AM"
+                />
+                <ActivityItem
+                  primary="Jane Smith"
+                  secondary="Updated their profile"
+                  avatar={<PeopleIcon />}
+                  date="Yesterday at 2:45 PM"
+                />
+                <ActivityItem
+                  primary="System"
+                  secondary="Scheduled maintenance completed"
+                  avatar={<ShoppingCartIcon />}
+                  date="Apr 10, 2023"
+                />
+                <ActivityItem
+                  primary="Mike Johnson"
+                  secondary="New order placed"
+                  avatar={<RevenueIcon />}
+                  date="Apr 8, 2023"
+                />
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </>
+  );
+}

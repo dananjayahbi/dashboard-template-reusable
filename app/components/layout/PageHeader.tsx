@@ -25,8 +25,7 @@ export default function PageHeader({
   action,
   sx = {} 
 }: PageHeaderProps) {
-  return (
-    <Box 
+  return (    <Box 
       sx={{ 
         mb: 4,
         display: 'flex',
@@ -34,6 +33,7 @@ export default function PageHeader({
         justifyContent: 'space-between',
         alignItems: { xs: 'flex-start', sm: 'center' },
         gap: 2,
+        width: '100%',
         ...sx
       }}
     >

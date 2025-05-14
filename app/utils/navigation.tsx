@@ -32,28 +32,6 @@ export const mainNavItems: NavItem[] = [
     roles: [UserRole.ADMIN, UserRole.MANAGER],
   },
   {
-    title: 'Profile',
-    path: '/dashboard/profile',
-    icon: PersonIcon,
-  },
-  {
-    title: 'UI Components',
-    path: '/dashboard/components',
-    icon: CategoryIcon,
-    children: [
-      {
-        title: 'Data Tables',
-        path: '/dashboard/components/tables',
-        icon: TableViewIcon,
-      },
-      {
-        title: 'Charts',
-        path: '/dashboard/components/charts',
-        icon: BarChartIcon,
-      },
-    ],
-  },
-  {
     title: 'Settings',
     path: '/dashboard/settings',
     icon: SettingsIcon,

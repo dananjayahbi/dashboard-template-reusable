@@ -62,7 +62,6 @@ export default function Header({ onMenuToggle }: HeaderProps) {
   const toggleThemeMode = () => {
     setMode(actualMode === 'light' ? 'dark' : 'light');
   };
-
   return (
     <AppBar 
       position="fixed" 
@@ -71,7 +70,9 @@ export default function Header({ onMenuToggle }: HeaderProps) {
         zIndex: (theme) => theme.zIndex.drawer + 1,
         backgroundColor: theme.palette.background.default,
         color: theme.palette.text.primary,
-        borderBottom: `1px solid ${theme.palette.divider}`
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        width: { xs: '100%', md: 'calc(100% - 280px)' },
+        ml: { xs: 0, md: '280px' }
       }}
     >
       <Toolbar>

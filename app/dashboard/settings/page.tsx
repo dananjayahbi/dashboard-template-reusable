@@ -27,10 +27,6 @@ import {
   Palette as PaletteIcon, 
   Security as SecurityIcon,
   KeyboardArrowRight as ArrowIcon,
-  Notifications as NotificationsIcon,
-  Language as LanguageIcon,
-  Storage as StorageIcon,
-  LockPerson as PrivacyIcon,
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import PageHeader from '../../components/layout/PageHeader';
@@ -106,30 +102,6 @@ export default function SettingsPage() {
       title: 'Security',
       icon: <SecurityIcon />,
       description: 'Secure your account and manage authentication'
-    },
-    {
-      id: 'notifications',
-      title: 'Notifications',
-      icon: <NotificationsIcon />,
-      description: 'Control how and when you receive notifications'
-    },
-    {
-      id: 'language',
-      title: 'Language & Region',
-      icon: <LanguageIcon />,
-      description: 'Set your preferred language and regional settings'
-    },
-    {
-      id: 'data',
-      title: 'Data & Storage',
-      icon: <StorageIcon />,
-      description: 'Manage your data and storage preferences'
-    },
-    {
-      id: 'privacy',
-      title: 'Privacy',
-      icon: <PrivacyIcon />,
-      description: 'Control your privacy settings and data sharing'
     },
   ];
 
@@ -231,130 +203,46 @@ export default function SettingsPage() {
                 />
                 <Divider />
                 <CardContent>
-                  <Stack spacing={3}>
-                    <Box>
-                      <Typography variant="subtitle1" gutterBottom>
-                        Change Password
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <TextField
-                            type="password"
-                            label="Current Password"
-                            fullWidth
-                            variant="outlined"
-                            size="small"
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            type="password"
-                            label="New Password"
-                            fullWidth
-                            variant="outlined"
-                            size="small"
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            type="password"
-                            label="Confirm New Password"
-                            fullWidth
-                            variant="outlined"
-                            size="small"
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Button variant="contained" color="primary">
-                            Update Password
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                    
-                    <Divider />
-                    
-                    <Box>
-                      <Typography variant="subtitle1" gutterBottom>
-                        Two-Factor Authentication
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" paragraph>
-                        Add an extra layer of security to your account by enabling two-factor authentication.
-                      </Typography>
-                      <Button variant="outlined" color="primary">
-                        Enable 2FA
+                  <Box sx={{ maxWidth: 500, mx: 'auto' }}>
+                    <Typography variant="h6" gutterBottom>
+                      Change Password
+                    </Typography>
+                    <Stack spacing={3}>
+                      <TextField
+                        type="password"
+                        label="Current Password"
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                      />
+                      <TextField
+                        type="password"
+                        label="New Password"
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                      />
+                      <TextField
+                        type="password"
+                        label="Confirm New Password"
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                      />
+                      <Button 
+                        variant="contained" 
+                        color="primary"
+                        sx={{ mt: 2, alignSelf: 'flex-start' }}
+                      >
+                        Update Password
                       </Button>
-                    </Box>
-                  </Stack>
+                    </Stack>
+                  </Box>
                 </CardContent>
               </>
             )}
             
-            {activeSection === 'notifications' && (
-              <>
-                <CardHeader 
-                  title="Notification Settings" 
-                  subheader="Control how and when you receive notifications"
-                />
-                <Divider />
-                <CardContent>
-                  <List>
-                    <ListItem secondaryAction={<Switch edge="end" defaultChecked />}>
-                      <ListItemIcon>
-                        <NotificationsIcon />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Email Notifications" 
-                        secondary="Receive notifications via email"
-                      />
-                    </ListItem>
-                    <Divider variant="inset" component="li" />
-                    
-                    <ListItem secondaryAction={<Switch edge="end" defaultChecked />}>
-                      <ListItemIcon>
-                        <NotificationsIcon />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Push Notifications" 
-                        secondary="Receive push notifications in your browser"
-                      />
-                    </ListItem>
-                    <Divider variant="inset" component="li" />
-                    
-                    <ListItem secondaryAction={<Switch edge="end" />}>
-                      <ListItemIcon>
-                        <NotificationsIcon />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary="Marketing Communications" 
-                        secondary="Receive updates about new features and offers"
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </>
-            )}
-            
-            {(activeSection === 'language' || activeSection === 'data' || activeSection === 'privacy') && (
-              <>
-                <CardHeader 
-                  title={`${settingsSections.find(s => s.id === activeSection)?.title} Settings`}
-                  subheader="This section is under development"
-                />
-                <Divider />
-                <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 8 }}>
-                  {settingsSections.find(s => s.id === activeSection)?.icon && (
-                    <Avatar sx={{ width: 80, height: 80, mb: 2, bgcolor: 'action.selected' }}>
-                      {settingsSections.find(s => s.id === activeSection)?.icon}
-                    </Avatar>
-                  )}
-                  <Typography variant="h6">Coming Soon</Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center', maxWidth: 400 }}>
-                    This settings section is currently under development and will be available soon.
-                  </Typography>
-                </CardContent>
-              </>
-            )}
+            {/* Other tab contents were removed as they are not needed */}
           </Card>
         </Grid>
       </Grid>
