@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import MUIThemeProvider from "./theme-provider";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
+import { Box } from '@mui/material';
 import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,10 +34,20 @@ export default function RootLayout({
       >
         <AppRouterCacheProvider>
           <MUIThemeProvider>
-            <Header />
-            <main>
-              {children}
-            </main>
+            <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+              <Sidebar />
+              <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <Header />
+                <main style={{ 
+                  padding: '20px', 
+                  flexGrow: 1, 
+                  overflow: 'auto',
+                  backgroundColor: '#fafafa' 
+                }}>
+                  {children}
+                </main>
+              </Box>
+            </Box>
           </MUIThemeProvider>
         </AppRouterCacheProvider>
       </body>
