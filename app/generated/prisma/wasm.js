@@ -122,16 +122,6 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.PostScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  content: 'content',
-  published: 'published',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  authorId: 'authorId'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -144,8 +134,7 @@ exports.Prisma.QueryMode = {
 
 
 exports.Prisma.ModelName = {
-  User: 'User',
-  Post: 'Post'
+  User: 'User'
 };
 
 /**

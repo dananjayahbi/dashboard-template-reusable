@@ -106,14 +106,12 @@ export async function DELETE(
         { status: 'error', message: 'User not found' },
         { status: 404 }
       );
-    }
-
-    // Delete the user (service method handles deleting related posts)
+    }    // Delete the user
     await userService.deleteUser(id);
 
     return NextResponse.json({
       status: 'success',
-      message: 'User and associated posts deleted successfully'
+      message: 'User deleted successfully'
     });
   } catch (error) {
     console.error('Failed to delete user:', error);
