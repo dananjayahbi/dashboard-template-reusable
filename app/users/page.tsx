@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { UserService } from '@/services/userService';
 import { Box, Typography, Paper, TextField, InputAdornment, Button, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Search as SearchIcon, PersonAdd as PersonAddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import UserCard from '@/components/UserCard';
+import UsersTable from '@/components/UsersTable';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Pagination from '@/components/Pagination';
 import { User } from '@/types';
@@ -307,38 +307,11 @@ export default function UsersPage() {
         </Paper>
       ) : (
         <>
-          {users.map((user) => (
-            <Box key={user.id} sx={{ position: 'relative' }}>
-              <UserCard 
-                user={user} 
-                onClick={() => handleUserClick(user.id)} 
-              />              <Button
-                variant="outlined"
-                color="error"
-                size="small"
-                startIcon={<DeleteIcon />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteClick(user);
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  minWidth: 'unset',
-                  borderRadius: '8px',
-                  py: 0.5,
-                  '&:hover': {
-                    backgroundColor: 'error.light',
-                    color: 'white',
-                    borderColor: 'error.light'
-                  }
-                }}
-              >
-                Delete
-              </Button>
-            </Box>
-          ))}
+          <UsersTable 
+            users={users} 
+            onDeleteClick={handleDeleteClick}
+            onRowClick={handleUserClick}
+          />
           
           <Pagination
             count={total}
