@@ -37,15 +37,15 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    const { id } = params;
+  try {    const { id } = params;
     const body = await req.json();
-    const { name, email, image } = body;
+    const { name, email, image, status } = body;
 
-    const updateData: { name?: string; email?: string; image?: string } = {};
+    const updateData: { name?: string; email?: string; image?: string; status?: 'active' | 'inactive' } = {};
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email;
     if (image !== undefined) updateData.image = image;
+    if (status !== undefined && (status === 'active' || status === 'inactive')) updateData.status = status;
 
     // Check if user exists
     const existingUser = await userService.getUserById(id);

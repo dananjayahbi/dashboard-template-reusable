@@ -74,10 +74,9 @@ export const UserService = {
   
   /**
    * Update a user
-   */
-  async updateUser(
+   */  async updateUser(
     id: string, 
-    userData: { name?: string; email?: string; image?: string }
+    userData: { name?: string; email?: string; image?: string; status?: 'active' | 'inactive' }
   ): Promise<ApiResponse<{ user: User }>> {
     try {
       const response = await fetch(`/api/users/${id}`, {

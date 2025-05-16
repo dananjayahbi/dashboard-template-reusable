@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -15,22 +15,43 @@ import {
   IconButton,
   Chip,
   Tooltip,
+  Switch,
   Menu,
   MenuItem,
 } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { 
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  MoreVert as MoreVertIcon
+} from '@mui/icons-material';
 import { User } from '@/types';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, differenceInDays } from 'date-fns';
 
 interface UsersTableProps {
   users: User[];
   onDeleteClick: (user: User) => void;
-  onEditClick: (user: User) => void;
   onRowClick: (userId: string) => void;
-  onStatusChange: (userId: string, newStatus: 'active' | 'inactive') => void;
+  onStatusChange: (user: User, newStatus: 'active' | 'inactive') => void;
 }
 
-export default function UsersTable({ users, onDeleteClick, onEditClick, onRowClick, onStatusChange }: UsersTableProps) {  // State and handlers removed since we now have direct status toggle
+export default function UsersTable({ users, onDeleteClick, onRowClick }: UsersTableProps) {
+  // Function to generate random status for users based on creation date
+  const getUserStatus = (user: User) => {
+    const daysSinceCreation = differenceInDays(new Date(), new Date(user.createdAt));
+    
+    // Determine status based on creation date
+    if (daysSinceCreation < 7) {
+      return { label: 'Active', color: { bg: 'success.light', text: 'success.dark' } };
+    } else if (daysSinceCreation < 30) {
+      return { label: 'Pending', color: { bg: 'warning.light', text: 'warning.dark' } };
+    } else if (daysSinceCreation < 90) {
+      return { label: 'On Sale', color: { bg: 'info.light', text: 'info.dark' } };
+    } else if (daysSinceCreation < 180) {
+      return { label: 'Inactive', color: { bg: 'error.light', text: 'error.dark' } };
+    } else {
+      return { label: 'Bouncing', color: { bg: 'secondary.light', text: 'secondary.dark' } };
+    }
+  };
   
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', mb: 2, overflow: 'hidden' }}>
@@ -38,11 +59,12 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
           <TableRow>
             <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>User Name</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>User ID</TableCell>
             <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Email</TableCell>
             <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Joined</TableCell>
             <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Type</TableCell>
             <TableCell sx={{ fontWeight: 'bold', py: 1.5, textAlign: 'center' }}>Status</TableCell>
-            <TableCell sx={{ fontWeight: 'bold', py: 1.5, textAlign: 'center' }}>Actions</TableCell>
+            <TableCell sx={{ fontWeight: 'bold', py: 1.5, textAlign: 'center' }}>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -73,49 +95,30 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
                   </Avatar>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>{user.name}</Typography>
                 </Box>
-              </TableCell>              <TableCell sx={{ color: 'text.secondary' }}>{user.email}</TableCell>
+              </TableCell>
+              <TableCell sx={{ color: 'text.secondary' }}>#{user.id.substring(0, 8)}</TableCell>
+              <TableCell sx={{ color: 'text.secondary' }}>{user.email}</TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>{formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>User</TableCell>
               <TableCell align="center">
-                <Tooltip title={`Click to mark as ${user.status === 'active' ? 'inactive' : 'active'}`}>
-                  <Chip
-                    label={user.status || 'active'}
-                    size="small"
-                    sx={{
-                      backgroundColor: user.status === 'inactive' ? 'error.light' : 'success.light',
-                      color: user.status === 'inactive' ? 'error.dark' : 'success.dark',
-                      fontWeight: 500,
-                      borderRadius: '16px',
-                      px: 1,
-                      textTransform: 'capitalize',
-                      cursor: 'pointer'
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStatusChange(user.id, user.status === 'active' ? 'inactive' : 'active');
-                    }}
-                  />
-                </Tooltip>
-              </TableCell>              <TableCell>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                  <Tooltip title="Edit User">
-                    <IconButton
+                {(() => {
+                  const status = getUserStatus(user);
+                  return (
+                    <Chip
+                      label={status.label}
                       size="small"
-                      color="primary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditClick(user);
-                      }}
                       sx={{
-                        '&:hover': { 
-                          backgroundColor: 'primary.light',
-                          color: 'white'
-                        }
+                        backgroundColor: status.color.bg,
+                        color: status.color.text,
+                        fontWeight: 500,
+                        borderRadius: '16px',
+                        px: 1,
                       }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
+                    />                  );
+                })()}
+              </TableCell>
+              <TableCell>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <Tooltip title="Delete User">
                     <IconButton 
                       size="small" 
@@ -139,7 +142,7 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
             </TableRow>
           ))}
         </TableBody>
-      </Table>      {/* Menu removed since we now have direct status toggle */}
+      </Table>
     </TableContainer>
   );
 }

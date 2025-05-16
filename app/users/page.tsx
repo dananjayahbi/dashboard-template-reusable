@@ -23,15 +23,20 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [total, setTotal] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const searchTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
   const successMessageTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
-  
-  // Form state for new user
+    // Form state for new user
   const [newUserForm, setNewUserForm] = useState<NewUserForm>({
+    name: '',
+    email: '',
+    image: ''
+  });
+  const [editUserForm, setEditUserForm] = useState<NewUserForm>({
     name: '',
     email: '',
     image: ''
@@ -163,6 +168,106 @@ export default function UsersPage() {
       // Set empty state on error
       setUsers([]);
       setTotal(0);
+    }
+  };
+  
+  // Handle edit user click
+  const handleEditClick = (user: User) => {
+    setUserToEdit(user);
+    setEditUserForm({
+      name: user.name,
+      email: user.email,
+      image: user.image || ''
+    });
+    setIsEditModalOpen(true);
+  };
+  
+  // Handle edit user submission
+  const handleUpdateUser = async () => {
+    // Validate form
+    const errors: { name?: string; email?: string } = {};
+    
+    if (!editUserForm.name.trim()) {
+      errors.name = 'Name is required';
+    }
+    
+    if (!editUserForm.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(editUserForm.email)) {
+      errors.email = 'Please enter a valid email';
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    
+    if (!userToEdit) return;
+    
+    try {
+      setFormSubmitting(true);
+      
+      const updateData: { name?: string; email?: string; image?: string } = {};
+      
+      // Only include fields that changed
+      if (editUserForm.name !== userToEdit.name) updateData.name = editUserForm.name;
+      if (editUserForm.email !== userToEdit.email) updateData.email = editUserForm.email;
+      if (editUserForm.image !== userToEdit.image) updateData.image = editUserForm.image;
+      
+      // If nothing changed, just close the modal
+      if (Object.keys(updateData).length === 0) {
+        setIsEditModalOpen(false);
+        return;
+      }
+      
+      await UserService.updateUser(userToEdit.id, updateData);
+      
+      setFormSuccess('User updated successfully!');
+      setSuccessMessage('User updated successfully!');
+      
+      // Clear success message after 5 seconds
+      clearTimeout(successMessageTimeout.current);
+      successMessageTimeout.current = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+      
+      // Close modal and reset form after a short delay
+      setTimeout(() => {
+        setIsEditModalOpen(false);
+        setFormSuccess(null);
+        setUserToEdit(null);
+        fetchUsers(); // Refresh the users list
+      }, 1500);
+      
+    } catch (err) {
+      setError('Failed to update user. Please try again later.');
+      console.error('Error updating user:', err);
+    } finally {
+      setFormSubmitting(false);
+    }
+  };
+  
+  // Handle status change
+  const handleStatusChange = async (userId: string, newStatus: 'active' | 'inactive') => {
+    try {
+      setLoading(true);
+      await UserService.updateUser(userId, { status: newStatus });
+      
+      // Show success message
+      setSuccessMessage(`User status has been updated to ${newStatus}`);
+      
+      // Clear success message after 5 seconds
+      clearTimeout(successMessageTimeout.current);
+      successMessageTimeout.current = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+      
+      // Refresh the user list
+      fetchUsers();
+    } catch (err) {
+      setError('Failed to update user status. Please try again later.');
+      console.error('Error updating user status:', err);
+      setLoading(false);
     }
   };
   
@@ -306,11 +411,12 @@ export default function UsersPage() {
           )}
         </Paper>
       ) : (
-        <>
-          <UsersTable 
+        <>          <UsersTable 
             users={users} 
             onDeleteClick={handleDeleteClick}
+            onEditClick={handleEditClick}
             onRowClick={handleUserClick}
+            onStatusChange={handleStatusChange}
           />
           
           <Pagination
@@ -430,6 +536,88 @@ export default function UsersPage() {
             sx={{ textTransform: 'none' }}
           >
             Delete
+          </Button>
+        </DialogActions>      </Dialog>
+      
+      {/* Edit User Modal */}
+      <Dialog 
+        open={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Edit User</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 3 }}>
+            Update user information.
+          </DialogContentText>
+          
+          <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <TextField
+              name="name"
+              label="Full Name"
+              value={editUserForm.name}
+              onChange={(e) => setEditUserForm({...editUserForm, name: e.target.value})}
+              fullWidth
+              required
+              error={!!formErrors.name}
+              helperText={formErrors.name}
+              disabled={formSubmitting}
+              autoFocus
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonAddIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+                  </InputAdornment>
+                )
+              }}
+            />
+            
+            <TextField
+              name="email"
+              label="Email Address"
+              type="email"
+              value={editUserForm.email}
+              onChange={(e) => setEditUserForm({...editUserForm, email: e.target.value})}
+              fullWidth
+              required
+              error={!!formErrors.email}
+              helperText={formErrors.email}
+              disabled={formSubmitting}
+            />
+            
+            <TextField
+              name="image"
+              label="Profile Image URL (Optional)"
+              value={editUserForm.image}
+              onChange={(e) => setEditUserForm({...editUserForm, image: e.target.value})}
+              fullWidth
+              disabled={formSubmitting}
+              placeholder="https://example.com/profile.jpg"
+            />
+          </Box>
+          
+          {formSuccess && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              {formSuccess}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button 
+            onClick={() => setIsEditModalOpen(false)} 
+            disabled={formSubmitting}
+            sx={{ textTransform: 'none' }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleUpdateUser} 
+            variant="contained"
+            disabled={formSubmitting}
+            sx={{ textTransform: 'none' }}
+          >
+            {formSubmitting ? 'Updating...' : 'Update User'}
           </Button>
         </DialogActions>
       </Dialog>

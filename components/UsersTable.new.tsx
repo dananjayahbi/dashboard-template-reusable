@@ -18,19 +18,41 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { 
+  Delete as DeleteIcon,
+  MoreVert as MoreVertIcon
+} from '@mui/icons-material';
 import { User } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 
 interface UsersTableProps {
   users: User[];
   onDeleteClick: (user: User) => void;
-  onEditClick: (user: User) => void;
   onRowClick: (userId: string) => void;
   onStatusChange: (userId: string, newStatus: 'active' | 'inactive') => void;
 }
 
-export default function UsersTable({ users, onDeleteClick, onEditClick, onRowClick, onStatusChange }: UsersTableProps) {  // State and handlers removed since we now have direct status toggle
+export default function UsersTable({ users, onDeleteClick, onRowClick, onStatusChange }: UsersTableProps) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
+    event.stopPropagation();
+    setSelectedUser(user);
+    setAnchorEl(event.currentTarget);
+  };
+  
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedUser(null);
+  };
+
+  const handleStatusChange = (newStatus: 'active' | 'inactive') => {
+    if (selectedUser) {
+      onStatusChange(selectedUser.id, newStatus);
+      handleMenuClose();
+    }
+  };
   
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', mb: 2, overflow: 'hidden' }}>
@@ -73,39 +95,30 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
                   </Avatar>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>{user.name}</Typography>
                 </Box>
-              </TableCell>              <TableCell sx={{ color: 'text.secondary' }}>{user.email}</TableCell>
+              </TableCell>
+              <TableCell sx={{ color: 'text.secondary' }}>{user.email}</TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>{formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>User</TableCell>
               <TableCell align="center">
-                <Tooltip title={`Click to mark as ${user.status === 'active' ? 'inactive' : 'active'}`}>
-                  <Chip
-                    label={user.status || 'active'}
-                    size="small"
-                    sx={{
-                      backgroundColor: user.status === 'inactive' ? 'error.light' : 'success.light',
-                      color: user.status === 'inactive' ? 'error.dark' : 'success.dark',
-                      fontWeight: 500,
-                      borderRadius: '16px',
-                      px: 1,
-                      textTransform: 'capitalize',
-                      cursor: 'pointer'
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onStatusChange(user.id, user.status === 'active' ? 'inactive' : 'active');
-                    }}
-                  />
-                </Tooltip>
-              </TableCell>              <TableCell>
+                <Chip
+                  label={user.status || 'Active'}
+                  size="small"
+                  sx={{
+                    backgroundColor: user.status === 'inactive' ? 'error.light' : 'success.light',
+                    color: user.status === 'inactive' ? 'error.dark' : 'success.dark',
+                    fontWeight: 500,
+                    borderRadius: '16px',
+                    px: 1,
+                    textTransform: 'capitalize'
+                  }}
+                />
+              </TableCell>
+              <TableCell>
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                  <Tooltip title="Edit User">
+                  <Tooltip title="More Actions">
                     <IconButton
                       size="small"
-                      color="primary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditClick(user);
-                      }}
+                      onClick={(e) => handleMenuOpen(e, user)}
                       sx={{
                         '&:hover': { 
                           backgroundColor: 'primary.light',
@@ -113,7 +126,7 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
                         }
                       }}
                     >
-                      <EditIcon />
+                      <MoreVertIcon />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Delete User">
@@ -139,7 +152,20 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
             </TableRow>
           ))}
         </TableBody>
-      </Table>      {/* Menu removed since we now have direct status toggle */}
+      </Table>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MenuItem 
+          onClick={() => handleStatusChange(selectedUser?.status === 'active' ? 'inactive' : 'active')}
+        >
+          {selectedUser?.status === 'active' ? 'Set as Inactive' : 'Set as Active'}
+        </MenuItem>
+      </Menu>
     </TableContainer>
   );
 }
