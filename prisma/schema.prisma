@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
@@ -10,130 +11,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// NextAuth Models
-model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.String
-  access_token      String? @db.String
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.String
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken String   @unique
-  userId       String   @db.ObjectId
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-// User model with role-based access control
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  firstName     String?
-  lastName      String?
-  email         String    @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  bio           String?
-  phone         String?
-  location      String?
-  role          Role      @default(USER)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  accounts      Account[]
-  sessions      Session[]
-  activities    Activity[]
-  notifications Notification[]
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]
 }
 
-// Role enum for user roles
-enum Role {
-  ADMIN
-  MANAGER
-  USER
-}
-
-// Settings model for user or system settings
-model Setting {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  key           String    @unique
-  value         String
-  category      String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-// Activity model for tracking user activities
-model Activity {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String    @db.ObjectId
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action        String
-  description   String
-  metadata      Json?
-  createdAt     DateTime  @default(now())
-}
-
-// Notification model for user notifications
-model Notification {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String    @db.ObjectId
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title         String
-  message       String
-  type          NotificationType @default(INFO)
-  isRead        Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-}
-
-enum NotificationType {
-  INFO
-  SUCCESS
-  WARNING
-  ERROR
-}
-
-// Project model for managing projects
-model Project {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  description   String?
-  status        ProjectStatus @default(PLANNING)
-  progress      Float     @default(0)
-  startDate     DateTime?
-  endDate       DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-enum ProjectStatus {
-  PLANNING
-  IN_PROGRESS
-  COMPLETED
-  ON_HOLD
-  CANCELLED
+model Post {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String   @db.ObjectId
 }

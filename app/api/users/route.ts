@@ -1,144 +1,72 @@
-// filepath: e:\My_GitHub_Repos\dashboard-template-reusable\app\api\users\route.ts
+import { userService } from '@/lib/db-service';
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import prisma from '../../../lib/prisma';
-import { authOptions } from '../auth/[...nextauth]/route';
 
-// GET /api/users - Get all users
+// GET all users with pagination
 export async function GET(req: NextRequest) {
   try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
+    const searchParams = req.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
     
-    if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+    const result = await userService.getAllUsers(page, limit);
     
-    // Get URL params for pagination and filtering
-    const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get('page') || '1');
-    const limit = parseInt(url.searchParams.get('limit') || '10');
-    const search = url.searchParams.get('search') || '';
-    
-    // Calculate skip value for pagination
-    const skip = (page - 1) * limit;
-    
-    // Prepare filter conditions
-    const where = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
-          ],
-        }
-      : {};
-    
-    // Fetch users with pagination
-    const users = await prisma.user.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        // Exclude password and other sensitive fields
-      },
-    });
-    
-    // Get total count for pagination
-    const total = await prisma.user.count({ where });
-    
-    return NextResponse.json({
-      users,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error: any) {
-    console.error('Error fetching users:', error);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { 
+        status: 'error', 
+        message: 'Failed to fetch users',
+        error: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
 }
 
-// POST /api/users - Create a new user
+// POST create a new user
 export async function POST(req: NextRequest) {
   try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    
     const body = await req.json();
-    const { firstName, lastName, email, password, role } = body;
-    
-    // Basic validation
-    if (!firstName || !lastName || !email || !password) {
+    const { name, email, image } = body;
+
+    if (!name || !email) {
       return NextResponse.json(
-        { message: 'Missing required fields' },
+        { status: 'error', message: 'Name and email are required' },
         { status: 400 }
       );
     }
-    
-    // Check if email already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-    
+
+    // Check if user with this email already exists
+    const existingUser = await userService.getUserByEmail(email);
+
     if (existingUser) {
       return NextResponse.json(
-        { message: 'User with this email already exists' },
+        { status: 'error', message: 'User with this email already exists' },
         { status: 409 }
       );
     }
-    
-    // Hash password
-    const bcrypt = await import('bcrypt');
-    const hashedPassword = await bcrypt.hash(password, 12);
-    
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        firstName,
-        lastName,
-        name: `${firstName} ${lastName}`,
-        email,
-        password: hashedPassword,
-        role,
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
+
+    // Create the new user
+    const newUser = await userService.createUser({
+      name,
+      email,
+      image
     });
-    
+
+    return NextResponse.json({ 
+      status: 'success',
+      message: 'User created successfully',
+      user: newUser
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Failed to create user:', error);
     return NextResponse.json(
-      { message: 'User created successfully', user },
-      { status: 201 }
-    );
-  } catch (error: any) {
-    console.error('Error creating user:', error);
-    return NextResponse.json(
-      { message: 'Internal server error' },
+      { 
+        status: 'error', 
+        message: 'Failed to create user',
+        error: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }

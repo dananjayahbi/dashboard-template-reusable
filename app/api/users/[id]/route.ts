@@ -1,176 +1,128 @@
-// filepath: e:\My_GitHub_Repos\dashboard-template-reusable\app\api\users\[id]\route.ts
+import { userService } from '@/lib/db-service';
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import prisma from '../../../../lib/prisma';
-import { authOptions } from '../../auth/[...nextauth]/route';
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
-
-// GET /api/users/[id] - Get a specific user
-export async function GET(req: NextRequest, { params }: Params) {
+// GET a specific user
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params;
     
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    
-    // Find user by ID
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        // Exclude password and other sensitive fields
-      },
-    });
-    
+    const user = await userService.getUserById(id);
+
     if (!user) {
       return NextResponse.json(
-        { message: 'User not found' },
+        { status: 'error', message: 'User not found' },
         { status: 404 }
       );
     }
-    
-    return NextResponse.json(user);
-  } catch (error: any) {
-    console.error(`Error fetching user ${params.id}:`, error);
+
+    return NextResponse.json({ user });
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { 
+        status: 'error', 
+        message: 'Failed to fetch user',
+        error: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
 }
 
-// PATCH /api/users/[id] - Update a specific user
-export async function PATCH(req: NextRequest, { params }: Params) {
+// PATCH update a user
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params;
-    
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    
-    // Get the request body
     const body = await req.json();
-    const { firstName, lastName, email, role } = body;
-    
-    // Find user by ID
-    const existingUser = await prisma.user.findUnique({
-      where: { id },
-    });
-    
+    const { name, email, image } = body;
+
+    const updateData: { name?: string; email?: string; image?: string } = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (image !== undefined) updateData.image = image;
+
+    // Check if user exists
+    const existingUser = await userService.getUserById(id);
+
     if (!existingUser) {
       return NextResponse.json(
-        { message: 'User not found' },
+        { status: 'error', message: 'User not found' },
         { status: 404 }
       );
     }
-    
-    // Check for email uniqueness if it's being updated
+
+    // Check if email is unique if we're updating it
     if (email && email !== existingUser.email) {
-      const emailExists = await prisma.user.findUnique({
-        where: { email },
-      });
-      
+      const emailExists = await userService.getUserByEmail(email);
+
       if (emailExists) {
         return NextResponse.json(
-          { message: 'Email is already in use' },
+          { status: 'error', message: 'Email already in use' },
           { status: 409 }
         );
       }
     }
-    
-    // Prepare update data
-    const updateData: any = {};
-    
-    if (firstName) updateData.firstName = firstName;
-    if (lastName) updateData.lastName = lastName;
-    if (firstName && lastName) updateData.name = `${firstName} ${lastName}`;
-    if (email) updateData.email = email;
-    if (role) updateData.role = role;
-    
+
     // Update the user
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: updateData,
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-    
+    const updatedUser = await userService.updateUser(id, updateData);
+
     return NextResponse.json({
+      status: 'success',
       message: 'User updated successfully',
-      user: updatedUser,
+      user: updatedUser
     });
-  } catch (error: any) {
-    console.error(`Error updating user ${params.id}:`, error);
+  } catch (error) {
+    console.error('Failed to update user:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { 
+        status: 'error', 
+        message: 'Failed to update user',
+        error: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
 }
 
-// DELETE /api/users/[id] - Delete a specific user
-export async function DELETE(req: NextRequest, { params }: Params) {
+// DELETE a user
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params;
-    
-    // Check authentication
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-    
+
     // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id },
-    });
-    
+    const existingUser = await userService.getUserById(id);
+
     if (!existingUser) {
       return NextResponse.json(
-        { message: 'User not found' },
+        { status: 'error', message: 'User not found' },
         { status: 404 }
       );
     }
-    
-    // Delete the user
-    await prisma.user.delete({
-      where: { id },
-    });
-    
+
+    // Delete the user (service method handles deleting related posts)
+    await userService.deleteUser(id);
+
     return NextResponse.json({
-      message: 'User deleted successfully',
+      status: 'success',
+      message: 'User and associated posts deleted successfully'
     });
-  } catch (error: any) {
-    console.error(`Error deleting user ${params.id}:`, error);
+  } catch (error) {
+    console.error('Failed to delete user:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { 
+        status: 'error', 
+        message: 'Failed to delete user',
+        error: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }

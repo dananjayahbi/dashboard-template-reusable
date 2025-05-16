@@ -113,90 +113,23 @@ Prisma.NullTypes = {
  * Enums
  */
 
-exports.Prisma.AccountScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  type: 'type',
-  provider: 'provider',
-  providerAccountId: 'providerAccountId',
-  refresh_token: 'refresh_token',
-  access_token: 'access_token',
-  expires_at: 'expires_at',
-  token_type: 'token_type',
-  scope: 'scope',
-  id_token: 'id_token',
-  session_state: 'session_state'
-};
-
-exports.Prisma.SessionScalarFieldEnum = {
-  id: 'id',
-  sessionToken: 'sessionToken',
-  userId: 'userId',
-  expires: 'expires'
-};
-
-exports.Prisma.VerificationTokenScalarFieldEnum = {
-  id: 'id',
-  identifier: 'identifier',
-  token: 'token',
-  expires: 'expires'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  firstName: 'firstName',
-  lastName: 'lastName',
   email: 'email',
-  emailVerified: 'emailVerified',
-  password: 'password',
   image: 'image',
-  bio: 'bio',
-  phone: 'phone',
-  location: 'location',
-  role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.SettingScalarFieldEnum = {
+exports.Prisma.PostScalarFieldEnum = {
   id: 'id',
-  key: 'key',
-  value: 'value',
-  category: 'category',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.ActivityScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  action: 'action',
-  description: 'description',
-  metadata: 'metadata',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.NotificationScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
   title: 'title',
-  message: 'message',
-  type: 'type',
-  isRead: 'isRead',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.ProjectScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  status: 'status',
-  progress: 'progress',
-  startDate: 'startDate',
-  endDate: 'endDate',
+  content: 'content',
+  published: 'published',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  authorId: 'authorId'
 };
 
 exports.Prisma.SortOrder = {
@@ -208,36 +141,11 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
-exports.Role = exports.$Enums.Role = {
-  ADMIN: 'ADMIN',
-  MANAGER: 'MANAGER',
-  USER: 'USER'
-};
 
-exports.NotificationType = exports.$Enums.NotificationType = {
-  INFO: 'INFO',
-  SUCCESS: 'SUCCESS',
-  WARNING: 'WARNING',
-  ERROR: 'ERROR'
-};
-
-exports.ProjectStatus = exports.$Enums.ProjectStatus = {
-  PLANNING: 'PLANNING',
-  IN_PROGRESS: 'IN_PROGRESS',
-  COMPLETED: 'COMPLETED',
-  ON_HOLD: 'ON_HOLD',
-  CANCELLED: 'CANCELLED'
-};
 
 exports.Prisma.ModelName = {
-  Account: 'Account',
-  Session: 'Session',
-  VerificationToken: 'VerificationToken',
   User: 'User',
-  Setting: 'Setting',
-  Activity: 'Activity',
-  Notification: 'Notification',
-  Project: 'Project'
+  Post: 'Post'
 };
 
 /**
