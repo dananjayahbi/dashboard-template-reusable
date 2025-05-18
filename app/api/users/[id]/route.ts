@@ -6,9 +6,9 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const id = params.id;
+  
   try {
-    const { id } = params;
-    
     const user = await userService.getUserById(id);
 
     if (!user) {
@@ -37,9 +37,9 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const id = params.id;
+  
   try {
-    // Get ID from params - await the params object
-    const { id } = params;
     console.log(`Starting update for user ${id}`);
     
     // Get request body
