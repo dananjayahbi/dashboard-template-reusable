@@ -1,9 +1,10 @@
 // User type definitions based on our Prisma schema
-export interface User {  id: string;
+export interface User {
+  id: string;
   name: string;
   email: string;
   image?: string | null;
-  status?: 'active' | 'inactive';
+  status: 'active' | 'inactive'; // Make status required, not optional
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
 }

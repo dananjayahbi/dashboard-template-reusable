@@ -141,33 +141,34 @@ export default function UsersPage() {
       setLoading(false);
     }
   };
-    const fetchUsers = async (currentPage = page, currentLimit = limit, search = searchTerm) => {
+  const fetchUsers = async (currentPage = page, currentLimit = limit, search = searchTerm) => {
     try {
       setLoading(true);
       setError(null);
       
+      console.log('Fetching users with params:', { page: currentPage, limit: currentLimit, search });
       const response = await UserService.getUsers(currentPage, currentLimit, search);
       
       // Check if the response contains users
       if (response && response.users) {
+        console.log('Users fetched successfully:', response.users.length);
         setUsers(response.users);
         setTotal(response.pagination.total);
       } else {
         // If response doesn't have expected structure, set empty array
+        console.warn('API returned unexpected response format:', response);
         setUsers([]);
         setTotal(0);
-        console.warn('API returned unexpected response format:', response);
       }
-      
-      setLoading(false);
     } catch (err) {
       setError('Failed to load users. Please try again later.');
-      setLoading(false);
       console.error('Error fetching users:', err);
       
       // Set empty state on error
       setUsers([]);
       setTotal(0);
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -245,13 +246,16 @@ export default function UsersPage() {
     } finally {
       setFormSubmitting(false);
     }
-  };
-  
-  // Handle status change
-  const handleStatusChange = async (userId: string, newStatus: 'active' | 'inactive') => {
+  };  // Handle status change
+  const handleStatusChange = async (userId: string, newStatus: 'active' | 'inactive'): Promise<any> => {
     try {
       setLoading(true);
-      await UserService.updateUser(userId, { status: newStatus });
+      console.log(`UsersPage.handleStatusChange called for user ${userId} status to ${newStatus}`);
+      
+      const response = await UserService.updateUser(userId, { status: newStatus });
+      
+      // Log the response to help with debugging
+      console.log('Status update response:', response);
       
       // Show success message
       setSuccessMessage(`User status has been updated to ${newStatus}`);
@@ -263,11 +267,17 @@ export default function UsersPage() {
       }, 5000);
       
       // Refresh the user list
-      fetchUsers();
-    } catch (err) {
-      setError('Failed to update user status. Please try again later.');
-      console.error('Error updating user status:', err);
+      await fetchUsers();
+      
+      // Set loading to false after all operations are complete
       setLoading(false);
+      
+      return response; // Return the response for the Promise chain
+    } catch (err) {
+      console.error('Error updating user status:', err);
+      setError('Failed to update user status. Please try again later.');
+      setLoading(false);
+      throw err; // Re-throw for the Promise chain
     }
   };
   

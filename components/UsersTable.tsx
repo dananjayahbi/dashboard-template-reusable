@@ -15,8 +15,7 @@ import {
   IconButton,
   Chip,
   Tooltip,
-  Menu,
-  MenuItem,
+  CircularProgress
 } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { User } from '@/types';
@@ -27,10 +26,31 @@ interface UsersTableProps {
   onDeleteClick: (user: User) => void;
   onEditClick: (user: User) => void;
   onRowClick: (userId: string) => void;
-  onStatusChange: (userId: string, newStatus: 'active' | 'inactive') => void;
+  onStatusChange: (userId: string, newStatus: 'active' | 'inactive') => Promise<any>;
 }
 
 export default function UsersTable({ users, onDeleteClick, onEditClick, onRowClick, onStatusChange }: UsersTableProps) {
+  const [processingStatus, setProcessingStatus] = useState<string | null>(null);
+
+  const handleStatusChange = (userId: string, newStatus: 'active' | 'inactive') => {
+    // Set processing state to show loading indicator
+    console.log(`UsersTable.handleStatusChange called for user ${userId} to status ${newStatus}`);
+    setProcessingStatus(userId);
+    
+    // Call the parent function to update status
+    onStatusChange(userId, newStatus)
+      .then((response) => {
+        console.log(`Status change succeeded for user ${userId}:`, response);
+        // Reset processing state on success
+        setProcessingStatus(null);
+      })
+      .catch((error) => {
+        console.error('Error updating status:', error);
+        // Reset processing state on error
+        setProcessingStatus(null);
+      });
+  };
+
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', mb: 2, overflow: 'hidden' }}>
       <Table sx={{ minWidth: 650 }}>
@@ -79,7 +99,7 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
               <TableCell align="center">
                 <Tooltip title={`Click to mark as ${user.status === 'active' ? 'inactive' : 'active'}`}>
                   <Chip
-                    label={user.status || 'active'}
+                    label={processingStatus === user.id ? '...' : (user.status || 'active')}
                     size="small"
                     sx={{
                       backgroundColor: user.status === 'inactive' ? 'error.light' : 'success.light',
@@ -88,12 +108,25 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
                       borderRadius: '16px',
                       px: 1,
                       textTransform: 'capitalize',
-                      cursor: 'pointer'
+                      cursor: processingStatus === user.id ? 'wait' : 'pointer',
+                      opacity: processingStatus === user.id ? 0.7 : 1,
+                      '&:hover': {
+                        backgroundColor: user.status === 'inactive' ? 'error.main' : 'success.main',
+                        color: 'white'
+                      }
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onStatusChange(user.id, user.status === 'active' ? 'inactive' : 'active');
+                      if (processingStatus !== user.id) {
+                        // Ensure undefined/null status is treated as 'active'
+                        const currentStatus = user.status || 'active';
+                        console.log('Toggling status for user:', user.id, 'Current status:', currentStatus, 'New status:', currentStatus === 'active' ? 'inactive' : 'active');
+                        handleStatusChange(user.id, currentStatus === 'active' ? 'inactive' : 'active');
+                      } else {
+                        console.log('Status change already in progress for user:', user.id);
+                      }
                     }}
+                    icon={processingStatus === user.id ? <CircularProgress size={12} color="inherit" /> : undefined}
                   />
                 </Tooltip>
               </TableCell>

@@ -1,4 +1,4 @@
-import { userService } from '@/lib/db-service';
+import { userService } from '@/lib/db-service.fixed';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET a specific user
@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = params?.id;
     
     const user = await userService.getUserById(id);
 
@@ -38,8 +38,8 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get ID from params - await the params object
-    const { id } = params;
+    // Get ID from params
+    const id = params?.id;
     console.log(`Starting update for user ${id}`);
     
     // Get request body
@@ -123,7 +123,7 @@ export async function DELETE(
 ) {
   try {
     // Access ID directly from params
-    const { id } = params;
+    const id = params?.id;
 
     // Check if user exists
     const existingUser = await userService.getUserById(id);
