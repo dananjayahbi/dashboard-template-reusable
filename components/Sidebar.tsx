@@ -1,14 +1,9 @@
 'use client';
 
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Typography, Tooltip, Avatar } from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Typography, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import ChatIcon from '@mui/icons-material/Chat';
-import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import PeopleIcon from '@mui/icons-material/People';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -57,28 +52,28 @@ const SidebarIcon = styled(ListItemIcon)({
 export default function Sidebar() {
   const [activeItem, setActiveItem] = useState('dashboard');
   const pathname = usePathname();
-  
+
+  // Only dashboard and users at the top
+  const topMenuItems = [
+    { id: 'dashboard', icon: <DashboardIcon />, label: 'Dashboard', path: '/' },
+    { id: 'users', icon: <PeopleIcon />, label: 'Users', path: '/users' },
+  ];
+  // Settings at the bottom
+  const bottomMenuItem = { id: 'settings', icon: <SettingsIcon />, label: 'Settings', path: '/settings' };
+
   useEffect(() => {
     // Update active item based on current path
-    const currentItem = menuItems.find(item => item.path === pathname || 
-      (pathname.startsWith(item.path) && item.path !== '/'));
-    
+    const allItems = [...topMenuItems, bottomMenuItem];
+    const currentItem = allItems.find(
+      item => item.path === pathname || (pathname.startsWith(item.path) && item.path !== '/')
+    );
     if (currentItem) {
       setActiveItem(currentItem.id);
     }
   }, [pathname]);
-  const menuItems = [
-    { id: 'dashboard', icon: <DashboardIcon />, label: 'Dashboard', path: '/' },
-    { id: 'users', icon: <PeopleIcon />, label: 'Users', path: '/users' },
-    { id: 'tasks', icon: <AssignmentIcon />, label: 'Tasks', path: '/tasks' },
-    { id: 'calendar', icon: <CalendarMonthIcon />, label: 'Calendar', path: '/calendar' },
-    { id: 'messages', icon: <ChatIcon />, label: 'Messages', path: '/messages' },
-    { id: 'files', icon: <FolderIcon />, label: 'Files', path: '/files' },
-    { id: 'notifications', icon: <NotificationsIcon />, label: 'Notifications', path: '/notifications' },
-    { id: 'settings', icon: <SettingsIcon />, label: 'Settings', path: '/settings' },
-  ];
-
-  return (    <Drawer
+  
+  return (
+    <Drawer
       variant="permanent"
       sx={{
         width: drawerWidth,
@@ -96,11 +91,12 @@ export default function Sidebar() {
           padding: '16px 0',
         },
       }}
-    >      <Box>
+    >
+      <Box>
         <Box
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
             alignItems: 'center',
             p: 1.5,
           }}
@@ -122,8 +118,8 @@ export default function Sidebar() {
             </Typography>
           </Box>
         </Box>
-          <List sx={{ mt: 2 }}>
-          {menuItems.slice(0, 5).map((item) => (
+        <List sx={{ mt: 2 }}>
+          {topMenuItems.map((item) => (
             <ListItem key={item.id} disablePadding>
               <Tooltip title={item.label} placement="right" arrow>
                 <Link href={item.path} style={{ textDecoration: 'none', width: '100%' }}>
@@ -138,42 +134,22 @@ export default function Sidebar() {
             </ListItem>
           ))}
         </List>
-      </Box>      <Box>        <List>
-          {menuItems.slice(5).map((item) => (
-            <ListItem key={item.id} disablePadding>
-              <Tooltip title={item.label} placement="right" arrow>
-                <Link href={item.path} style={{ textDecoration: 'none', width: '100%' }}>
-                  <SidebarItem
-                    onClick={() => setActiveItem(item.id)}
-                    selected={activeItem === item.id}
-                  >
-                    <SidebarIcon>{item.icon}</SidebarIcon>
-                  </SidebarItem>
-                </Link>
-              </Tooltip>
-            </ListItem>
-          ))}
+      </Box>
+      <Box>
+        <List>
+          <ListItem key={bottomMenuItem.id} disablePadding>
+            <Tooltip title={bottomMenuItem.label} placement="right" arrow>
+              <Link href={bottomMenuItem.path} style={{ textDecoration: 'none', width: '100%' }}>
+                <SidebarItem
+                  onClick={() => setActiveItem(bottomMenuItem.id)}
+                  selected={activeItem === bottomMenuItem.id}
+                >
+                  <SidebarIcon>{bottomMenuItem.icon}</SidebarIcon>
+                </SidebarItem>
+              </Link>
+            </Tooltip>
+          </ListItem>
         </List>
-
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          mt: 2, 
-          mb: 2 
-        }}>
-          <Tooltip title="Profile" placement="right" arrow>
-            <Avatar 
-              sx={{ 
-                width: 36, 
-                height: 36, 
-                cursor: 'pointer',
-                border: '2px solid #f3f4f6' 
-              }}
-              alt="User Profile"
-              src="https://randomuser.me/api/portraits/men/32.jpg"
-            />
-          </Tooltip>
-        </Box>
       </Box>
     </Drawer>
   );

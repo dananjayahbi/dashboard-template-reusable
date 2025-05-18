@@ -6,9 +6,9 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const id = params.id;
+  
   try {
-    const { id } = params;
-    
     const user = await userService.getUserById(id);
 
     if (!user) {
@@ -37,9 +37,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { id } = await params; // Await the params object
   try {
-    // Get ID from params - await the params object
-    const { id } = params;
     console.log(`Starting update for user ${id}`);
     
     // Get request body
@@ -117,13 +116,10 @@ export async function PATCH(
 }
 
 // DELETE a user
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, context: { params: { id: string } }) {
   try {
-    // Access ID directly from params
-    const { id } = params;
+    // Await params as per Next.js dynamic API requirements
+    const { id } = await context.params;
 
     // Check if user exists
     const existingUser = await userService.getUserById(id);
