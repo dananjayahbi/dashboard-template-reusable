@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = params.id;
     
     const user = await userService.getUserById(id);
 
@@ -37,7 +37,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {    const { id } = params;
+  try {
+    const id = params.id;
     const body = await req.json();
     const { name, email, image, status } = body;
 
@@ -96,7 +97,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    // Access ID directly from params
+    const id = params.id;
 
     // Check if user exists
     const existingUser = await userService.getUserById(id);
@@ -106,7 +108,9 @@ export async function DELETE(
         { status: 'error', message: 'User not found' },
         { status: 404 }
       );
-    }    // Delete the user
+    }
+    
+    // Delete the user
     await userService.deleteUser(id);
 
     return NextResponse.json({

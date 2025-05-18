@@ -30,7 +30,8 @@ interface UsersTableProps {
   onStatusChange: (userId: string, newStatus: 'active' | 'inactive') => void;
 }
 
-export default function UsersTable({ users, onDeleteClick, onEditClick, onRowClick, onStatusChange }: UsersTableProps) {
+export default function UsersTable({ users, onDeleteClick, onEditClick, onRowClick, onStatusChange }: UsersTableProps) {  // State and handlers removed since we now have direct status toggle
+  
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', mb: 2, overflow: 'hidden' }}>
       <Table sx={{ minWidth: 650 }}>
@@ -71,8 +72,7 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
                     {!user.image && user.name.charAt(0)}
                   </Avatar>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>{user.name}</Typography>
-                </Box>
-              </TableCell>
+                </Box>              </TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>{user.email}</TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>{formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</TableCell>
               <TableCell sx={{ color: 'text.secondary' }}>User</TableCell>
@@ -94,8 +94,7 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
                       e.stopPropagation();
                       onStatusChange(user.id, user.status === 'active' ? 'inactive' : 'active');
                     }}
-                  />
-                </Tooltip>
+                  />                </Tooltip>
               </TableCell>
               <TableCell>
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
@@ -140,7 +139,7 @@ export default function UsersTable({ users, onDeleteClick, onEditClick, onRowCli
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </Table>      {/* Menu removed since we now have direct status toggle */}
     </TableContainer>
   );
 }
