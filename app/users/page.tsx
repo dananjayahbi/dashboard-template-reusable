@@ -354,14 +354,6 @@ export default function UsersPage() {
       >
         <Typography variant="h5" fontWeight="bold">
           Users
-          <Typography
-            component="p"
-            variant="body1"
-            color="text.secondary"
-            mt={1}
-          >
-            Manage your user profiles
-          </Typography>
         </Typography>
       </Box>
 
@@ -422,7 +414,7 @@ export default function UsersPage() {
             }}
             sx={{ maxWidth: "600px" }}
           />
-            <Button
+          <Button
             variant="contained"
             startIcon={<PersonAddIcon />}
             onClick={() => setIsNewUserModalOpen(true)}
@@ -433,9 +425,9 @@ export default function UsersPage() {
               whiteSpace: "nowrap",
               ml: "auto", // This pushes the button to the right
             }}
-            >
+          >
             New User
-            </Button>
+          </Button>
         </Box>
       </Paper>
       {error && (
