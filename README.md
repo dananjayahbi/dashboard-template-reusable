@@ -20,6 +20,38 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Authentication
+
+This project uses NextAuth.js for authentication. Here's how to use it:
+
+### Features
+
+- User registration with email and password
+- Secure password hashing with bcrypt
+- Login with credentials (email/password)
+- Protected routes with session validation
+- User profile information in header
+
+### Setup Steps
+
+1. Make sure your MongoDB is set up correctly (see MONGODB.md)
+2. Set these environment variables in your `.env` file:
+   ```
+   NEXTAUTH_SECRET="your-secure-secret-here"
+   NEXTAUTH_URL="http://localhost:3000"
+   DATABASE_URL="your-mongodb-connection-string"
+   ```
+3. Run Prisma generate to update database schema:
+   ```bash
+   npx prisma generate
+   ```
+
+### Authentication Flow
+
+1. Register: Go to `/auth/register` to create a new account
+2. Login: Go to `/auth/login` to sign in
+3. Logout: Click on the profile icon in the header and select Logout
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

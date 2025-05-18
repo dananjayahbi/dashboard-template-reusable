@@ -26,9 +26,10 @@ export default function Header() {
     handleClose();
     router.push(path);
   };
-    const handleLogout = async () => {
+  
+  const handleLogout = async () => {
     handleClose();
-    await signOut({ redirect: true, callbackUrl: '/auth' });
+    await signOut({ redirect: true, callbackUrl: '/auth/login' });
   };
 
   return (

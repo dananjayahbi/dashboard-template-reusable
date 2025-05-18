@@ -9,6 +9,19 @@ export interface User {
   updatedAt: string; // ISO date string
 }
 
+// Authentication types
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface RegisterFormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 // For pagination responses
 export interface PaginatedResponse<T> {
   pagination: {
