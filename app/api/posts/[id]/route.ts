@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = params.id;
     
     const post = await postService.getPostById(id);
 
@@ -38,7 +38,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = params.id;
     const body = await req.json();
     const { title, content, published } = body;
 
@@ -83,7 +83,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const id = params.id;
 
     // Check if post exists
     const existingPost = await postService.getPostById(id);

@@ -18,19 +18,11 @@ DATABASE_URL="mongodb+srv://<username>:<password>@<cluster-url>/<database>?retry
 - `GET /api/mongodb-status`: Check if MongoDB connection is working and get database statistics
 
 ### Users
-- `GET /api/users`: Get all users (supports pagination with `?page=1&limit=10`)
+- `GET /api/users`: Get all users (supports pagination with `?page=1&limit=10` and searching with `?search=query`)
 - `POST /api/users`: Create a new user
 - `GET /api/users/[id]`: Get a specific user by ID
 - `PATCH /api/users/[id]`: Update a user
-- `DELETE /api/users/[id]`: Delete a user and their posts
-
-### Posts
-- `GET /api/posts`: Get all posts (supports pagination, filtering by `published`, `authorId`, and search)
-- `POST /api/posts`: Create a new post
-- `GET /api/posts/[id]`: Get a specific post by ID
-- `PATCH /api/posts/[id]`: Update a post
-- `DELETE /api/posts/[id]`: Delete a post
-- `GET /api/posts/stats`: Get post statistics
+- `DELETE /api/users/[id]`: Delete a user
 
 ## Usage
 
@@ -64,7 +56,7 @@ npm run prisma:generate
 
 ## Models
 
-The project includes the following models:
+The project includes the following model:
 
 ### User
 - `id`: String (ObjectId)
@@ -73,17 +65,6 @@ The project includes the following models:
 - `image`: String (optional)
 - `createdAt`: DateTime
 - `updatedAt`: DateTime
-- `posts`: Relation to Posts
-
-### Post
-- `id`: String (ObjectId)
-- `title`: String
-- `content`: String (optional)
-- `published`: Boolean (default: false)
-- `createdAt`: DateTime
-- `updatedAt`: DateTime
-- `author`: Relation to User
-- `authorId`: String (ObjectId)
 
 ## Testing
 
@@ -101,3 +82,49 @@ curl -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
   -d '{"name": "Test User", "email": "test@example.com"}'
 ```
+
+## UI Implementation
+
+### User Interface Components
+
+The MongoDB integration is fully exposed through the user interface:
+
+1. **Users Page**
+   - Located at `/users`
+   - Displays user data from MongoDB in a card-based layout
+   - Includes pagination for handling large datasets
+   - Features search functionality for filtering users by name or email
+   - Provides options to create and delete user records
+   - Shows success/error feedback for all operations
+
+2. **User Management Features**
+   - **Search**: Real-time filtering of users with clear button
+   - **Create New User**: Form modal with validation for adding users
+   - **Delete User**: Confirmation dialog with success feedback
+   - **Pagination**: Configurable items per page with page navigation
+
+3. **Navigation**
+   - The sidebar includes navigation to the Users page
+   - Active page state is maintained based on the current route
+
+4. **Components**
+   - `UserCard.tsx`: Displays individual user information with post counts
+   - `Pagination.tsx`: Handles pagination of MongoDB query results
+   - `LoadingSpinner.tsx`: Shows loading state during data fetching
+
+## Enhanced Features
+
+1. **Interactive UI Elements**
+   - Enhanced user cards with hover effects and visual feedback
+   - Improved button states for better user interaction
+   - Success/error feedback messages for all operations
+
+2. **Real-time Search**
+   - Debounced search to minimize database queries
+   - Clear button for search input
+   - Empty state that changes based on search context
+
+3. **Error Handling**
+   - Comprehensive client-side validation
+   - Graceful error handling for all API operations
+   - User-friendly error messages with recovery options

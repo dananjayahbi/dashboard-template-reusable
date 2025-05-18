@@ -7,8 +7,9 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
     
-    const result = await userService.getAllUsers(page, limit);
+    const result = await userService.getAllUsers(page, limit, search);
     
     return NextResponse.json(result);
   } catch (error) {

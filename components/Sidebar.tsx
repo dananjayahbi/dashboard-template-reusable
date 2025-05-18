@@ -9,7 +9,10 @@ import ChatIcon from '@mui/icons-material/Chat';
 import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useState } from 'react';
+import PeopleIcon from '@mui/icons-material/People';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const drawerWidth = 72;
 
@@ -53,15 +56,26 @@ const SidebarIcon = styled(ListItemIcon)({
 
 export default function Sidebar() {
   const [activeItem, setActiveItem] = useState('dashboard');
-
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    // Update active item based on current path
+    const currentItem = menuItems.find(item => item.path === pathname || 
+      (pathname.startsWith(item.path) && item.path !== '/'));
+    
+    if (currentItem) {
+      setActiveItem(currentItem.id);
+    }
+  }, [pathname]);
   const menuItems = [
-    { id: 'dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
-    { id: 'tasks', icon: <AssignmentIcon />, label: 'Tasks' },
-    { id: 'calendar', icon: <CalendarMonthIcon />, label: 'Calendar' },
-    { id: 'messages', icon: <ChatIcon />, label: 'Messages' },
-    { id: 'files', icon: <FolderIcon />, label: 'Files' },
-    { id: 'notifications', icon: <NotificationsIcon />, label: 'Notifications' },
-    { id: 'settings', icon: <SettingsIcon />, label: 'Settings' },
+    { id: 'dashboard', icon: <DashboardIcon />, label: 'Dashboard', path: '/' },
+    { id: 'users', icon: <PeopleIcon />, label: 'Users', path: '/users' },
+    { id: 'tasks', icon: <AssignmentIcon />, label: 'Tasks', path: '/tasks' },
+    { id: 'calendar', icon: <CalendarMonthIcon />, label: 'Calendar', path: '/calendar' },
+    { id: 'messages', icon: <ChatIcon />, label: 'Messages', path: '/messages' },
+    { id: 'files', icon: <FolderIcon />, label: 'Files', path: '/files' },
+    { id: 'notifications', icon: <NotificationsIcon />, label: 'Notifications', path: '/notifications' },
+    { id: 'settings', icon: <SettingsIcon />, label: 'Settings', path: '/settings' },
   ];
 
   return (    <Drawer
@@ -108,32 +122,34 @@ export default function Sidebar() {
             </Typography>
           </Box>
         </Box>
-        
-        <List sx={{ mt: 2 }}>
+          <List sx={{ mt: 2 }}>
           {menuItems.slice(0, 5).map((item) => (
             <ListItem key={item.id} disablePadding>
               <Tooltip title={item.label} placement="right" arrow>
-                <SidebarItem
-                  onClick={() => setActiveItem(item.id)}
-                  selected={activeItem === item.id}
-                >
-                  <SidebarIcon>{item.icon}</SidebarIcon>
-                </SidebarItem>
+                <Link href={item.path} style={{ textDecoration: 'none', width: '100%' }}>
+                  <SidebarItem
+                    onClick={() => setActiveItem(item.id)}
+                    selected={activeItem === item.id}
+                  >
+                    <SidebarIcon>{item.icon}</SidebarIcon>
+                  </SidebarItem>
+                </Link>
               </Tooltip>
             </ListItem>
           ))}
         </List>
-      </Box>      <Box>
-        <List>
+      </Box>      <Box>        <List>
           {menuItems.slice(5).map((item) => (
             <ListItem key={item.id} disablePadding>
               <Tooltip title={item.label} placement="right" arrow>
-                <SidebarItem
-                  onClick={() => setActiveItem(item.id)}
-                  selected={activeItem === item.id}
-                >
-                  <SidebarIcon>{item.icon}</SidebarIcon>
-                </SidebarItem>
+                <Link href={item.path} style={{ textDecoration: 'none', width: '100%' }}>
+                  <SidebarItem
+                    onClick={() => setActiveItem(item.id)}
+                    selected={activeItem === item.id}
+                  >
+                    <SidebarIcon>{item.icon}</SidebarIcon>
+                  </SidebarItem>
+                </Link>
               </Tooltip>
             </ListItem>
           ))}
