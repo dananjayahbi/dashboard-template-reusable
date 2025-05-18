@@ -116,13 +116,10 @@ export async function PATCH(
 }
 
 // DELETE a user
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, context: { params: { id: string } }) {
   try {
-    // Access ID directly from params
-    const { id } = params;
+    // Await params as per Next.js dynamic API requirements
+    const { id } = await context.params;
 
     // Check if user exists
     const existingUser = await userService.getUserById(id);
