@@ -37,8 +37,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const id = params.id;
-  
+  const { id } = await params; // Await the params object
   try {
     console.log(`Starting update for user ${id}`);
     
